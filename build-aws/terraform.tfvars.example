@@ -1,0 +1,7 @@
+
+studio_domain = "mydomain.com"
+
+aws_profile = "myprofile"
+aws_region = "us-west-2"
+
+num_workers = 1

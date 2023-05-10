@@ -1,0 +1,38 @@
+## install the needed packages
+
+- name: install mariadb server
+  apt:
+    pkg:
+    - mariadb-server
+    state: present
+
+
+## secure the db server
+
+- name: upload db config sql
+  template:
+    src: config.sql
+    dest: /var/tmp/config.sql
+
+- name: config mariadb
+  shell: mariadb < /var/tmp/config.sql
+
+- name: cleanup
+  file:
+    path: /var/tmp/config.sql
+    state: absent
+
+## configure the server TCP interface
+
+- name: configure listen addresses
+  lineinfile: 
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    regexp: '^bind-address'
+    line: bind-address = 0.0.0.0
+  notify:
+    - restart mariadb
+
+## run the handlers
+
+- name: run handlers
+  meta: flush_handlers

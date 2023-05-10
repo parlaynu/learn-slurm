@@ -1,0 +1,31 @@
+## set the hostname
+
+- name: set hostname
+  hostname:
+    name: '{{ server_name }}'
+
+
+## install packages
+
+- name: update package cache
+  apt:
+    update_cache: true
+
+- name: install network packages
+  apt:
+    pkg:
+    - net-tools
+    - dnsutils
+    - traceroute
+    - tcpdump
+    state: present
+
+
+## setup the hosts file
+
+- name: setup hosts file
+  lineinfile: 
+    path: /etc/hosts
+    regexp: "^{{ item.address }}"
+    line: "{{ item.address }} {{ item.name }}.{{ studio_domain }} {{ item.name }}"
+  loop: "{{ all_servers }}"

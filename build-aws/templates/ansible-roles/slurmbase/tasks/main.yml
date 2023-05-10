@@ -1,0 +1,11 @@
+- name: create group slurmers
+  group:
+    name: slurmers
+    state: present
+
+- name: add user ubuntu to the group
+  user:
+    name: ubuntu
+    groups: slurmers
+    append: yes
+

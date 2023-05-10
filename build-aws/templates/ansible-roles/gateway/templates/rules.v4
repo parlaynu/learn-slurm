@@ -1,0 +1,16 @@
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+COMMIT
+
+*nat
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+{% for cidr_block in private_cidr_blocks %}
+-A POSTROUTING -o {{ ansible_default_ipv4.interface }} -d {{ cidr_block }} -j ACCEPT
+{% endfor %}
+-A POSTROUTING -o {{ ansible_default_ipv4.interface }} -j MASQUERADE
+COMMIT

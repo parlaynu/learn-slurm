@@ -1,0 +1,8 @@
+## install the needed packages
+
+- name: install mariadb client
+  apt:
+    pkg:
+    - mariadb-client
+    state: present
+

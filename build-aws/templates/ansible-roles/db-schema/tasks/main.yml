@@ -1,0 +1,14 @@
+## create the db schema
+
+- name: upload db schema sql
+  copy:
+    src: config.sql
+    dest: /var/tmp/config.sql
+
+- name: create schema
+  shell: mariadb < /var/tmp/config.sql
+
+- name: cleanup
+  file:
+    path: /var/tmp/config.sql
+    state: absent

@@ -1,0 +1,60 @@
+- name: install nfs server
+  apt:
+    name: nfs-kernel-server
+
+# NOTE: we need to get the device this way because AWS chanced something in their latest 
+#   releases that means the device name you pass to it through terraform is ignored and
+#   it creates the disk with whatever device name it wants... for nvme disks anyway. 
+#   There is no way to get this name using terraform ... or at least, none I could find. 
+#   Instead use the volume id (which we can get from terraform) to find the device in the 
+#   list of devices that that ansible finds.
+- name: get the disk device name
+  set_fact:
+    disk_device: "{{ ansible_device_links.ids | dict2items | selectattr('value', 'search', '${volume_id}') | json_query('[].key') | first }}"
+
+- name: the disk device name
+  debug:
+    msg: "{{ disk_device }}"
+
+- name: partition project disk
+  parted:
+    device: "/dev/{{ disk_device }}"
+    name: PROJECTS
+    number: 1
+    label: gpt
+    state: present
+
+- name: format project disk
+  filesystem:
+    fstype: ext4
+    dev: "/dev/disk/by-partlabel/PROJECTS"
+
+- name: mount project disk
+  mount:
+    path: "/projects"
+    src: PARTLABEL=PROJECTS
+    fstype: ext4
+    opts: "acl,user_xattr,nosuid,nofail"
+    state: mounted
+
+- name: set project permissions
+  file:
+    path: "/projects"
+    mode: 0755
+
+- name: create slurm directory
+  file:
+    path: "/projects/slurm"
+    state: directory
+    owner: root
+    group: root
+    mode: 0777
+
+- name: add export entry
+  lineinfile:
+    path: /etc/exports
+    regexp: '^/projects'
+    line: "/projects   ${export_client}(mp,rw,async,no_subtree_check,root_squash)"
+
+- name: export the filesystem
+  shell: exportfs  ${export_client}:/projects

@@ -1,0 +1,32 @@
+## install the needed packages
+
+- name: install slurmctld
+  apt:
+    pkg:
+    - slurmctld
+    state: present
+
+
+## upload the config file
+
+- name: upload the config file
+  template:
+    src: slurm.conf
+    dest: /etc/slurm/slurm.conf
+    owner: ${slurmdb_user}
+    group: slurmers
+    mode: 0640
+  notify:
+    - restart slurmctld
+
+
+## create the spool directory
+
+- name: create spool directory
+  file:
+    path: /var/spool/slurmctld
+    state: directory
+    owner: ${slurmdb_user}
+    group: root
+    mode: 0755
+

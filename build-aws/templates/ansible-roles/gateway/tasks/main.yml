@@ -1,0 +1,55 @@
+## configure as a router
+
+- name: enable packet forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+
+- name: enable secure redirects
+  sysctl:
+    name: net.ipv4.conf.all.secure_redirects
+    value: 1
+
+- name: disable accept redirects
+  sysctl:
+    name: net.ipv4.conf.all.accept_redirects
+    value: 0
+
+- name: disable source routing
+  sysctl:
+    name: net.ipv4.conf.all.accept_source_route
+    value: 0
+
+- name: disable send redirects
+  sysctl:
+    name: net.ipv4.conf.all.send_redirects
+    value: 0
+
+
+## setup iptables masquerading
+
+- name: install iptables-persistent
+  apt:
+    name: iptables-persistent
+    state: present
+
+- name: install iptable v4 rules
+  template:
+    src: rules.v4
+    dest: /etc/iptables/rules.v4
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restore iptables v4
+
+- name: install iptable v6 rules
+  template:
+    src: rules.v6
+    dest: /etc/iptables/rules.v6
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restore iptables v6
+

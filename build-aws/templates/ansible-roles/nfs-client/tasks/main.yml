@@ -1,0 +1,12 @@
+- name: install nfs client
+  apt:
+    name: nfs-common
+
+- name: mount project disk
+  mount:
+    path: "/projects"
+    src: "${nfs_server}:/projects"
+    fstype: nfs
+    opts: "vers=4,rw,hard,softreval,nosuid,nofail"
+    state: mounted
+
