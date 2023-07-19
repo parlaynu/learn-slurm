@@ -1,0 +1,20 @@
+## install the needed packages
+
+- name: install slurmdbd
+  apt:
+    pkg:
+    - slurmdbd
+    state: present
+
+## upload the config file
+
+- name: upload the config file
+  template:
+    src: slurmdbd.conf
+    dest: /etc/slurm/slurmdbd.conf
+    owner: ${slurmdb_user}
+    group: root
+    mode: 0600
+  notify:
+    - restart slurmdbd
+

@@ -1,0 +1,24 @@
+## install the needed packages
+
+- name: install munge
+  apt:
+    pkg:
+    - munge
+    state: present
+
+- name: download a key
+  fetch:
+    src: /etc/munge/munge.key
+    dest: fetch/munge.key
+    flat: yes
+  run_once: true
+
+- name: upload munge key
+  copy:
+    src: fetch/munge.key
+    dest: /etc/munge/munge.key
+    owner: munge
+    group: munge
+    mode: 0600
+  notify:
+    - restart munge

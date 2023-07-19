@@ -1,0 +1,7 @@
+
+- name: restart slurmctld
+  systemd:
+    name: slurmctld
+    state: restarted
+    enabled: true
+
